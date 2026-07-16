@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Dine POS{% endblock %}
+
+{% block content %}
+<div class="container auth-wrapper">
+    <div class="card auth-card">
+        <div class="row g-0">
+            <div class="col-md-6 d-none d-md-block">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80" alt="Login Image" class="img-fluid h-100 object-fit-cover">
+            </div>
+            <div class="col-md-6 p-5 d-flex flex-column justify-content-center">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold" style="color: var(--primary-color);">Welcome Back</h2>
+                    <p class="text-muted">Login to your account to continue</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    <div class="mb-3">
+                        <label for="mobile" class="form-label">Mobile Number / Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-phone"></i></span>
+                            <input type="text" class="form-control border-start-0" id="mobile" name="mobile" required placeholder="Enter mobile number">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control border-start-0" id="password" name="password" required placeholder="Enter password">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-custom w-100 mb-3">Login</button>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-decoration-none" style="color: var(--accent);">Register here</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

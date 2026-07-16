@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Kitchen Dashboard - Dine POS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="fa-solid fa-fire-burner me-2 text-danger"></i>Kitchen Dashboard</h2>
+                <p class="text-muted">Manage active orders and update their status.</p>
+            </div>
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary rounded-pill">View Menu</a>
+        </div>
+    </div>
+
+    <!-- Active Orders Grid -->
+    <div class="row g-4">
+        {% for order in orders %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100 {% if order.status == 'Pending' %}border-top border-warning border-4{% elif order.status == 'Preparing' %}border-top border-primary border-4{% elif order.status == 'Served' %}border-top border-success border-4{% endif %}">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <span class="badge bg-light text-dark border fs-6 px-3 py-2">#{{ order.id }}</span>
+                        <span class="badge rounded-pill {% if order.status == 'Pending' %}bg-warning text-dark{% elif order.status == 'Preparing' %}bg-primary{% else %}bg-success{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </div>
+                    <div class="card-body px-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div>
+                                <small class="text-muted d-block">Table / Type</small>
+                                <span class="fw-bold fs-5">{{ order.table_no }}</span>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Time</small>
+                                <span class="fw-medium">{{ order.created_at.strftime('%I:%M %p') }}</span>
+                            </div>
+                        </div>
+
+                        <ul class="list-unstyled mb-4">
+                            {% for item in order.items %}
+                            <li class="d-flex justify-content-between mb-2">
+                                <span><span class="fw-bold me-2">{{ item.quantity }}x</span> {{ item.dish.dish_name if item.dish else 'Unknown Dish' }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        
+                        <div class="mt-auto pt-3 border-top">
+                            <form method="POST" action="{{ url_for('kitchen.update_status', order_id=order.id) }}">
+                                {% if order.status == 'Pending' %}
+                                    <input type="hidden" name="status" value="Preparing">
+                                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">Start Preparing</button>
+                                {% elif order.status == 'Preparing' %}
+                                    <input type="hidden" name="status" value="Served">
+                                    <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm">Mark as Served</button>
+                                {% else %}
+                                    <div class="text-center">
+                                        <div class="fw-bold mb-2">Served</div>
+                                        {% if order.payment_status == 'Completed' %}
+                                            <span class="badge bg-success w-100 py-2 rounded-pill"><i class="fa-solid fa-check-circle me-1"></i> Customer Paid</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary w-100 py-2 rounded-pill"><i class="fa-solid fa-clock me-1"></i> Awaiting Payment</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fa-solid fa-mug-hot fs-1 text-muted mb-3 opacity-50"></i>
+                <h4 class="fw-bold text-muted">No active orders</h4>
+                <p class="text-muted">The kitchen is quiet for now. Great job!</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

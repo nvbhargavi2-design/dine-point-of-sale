@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Order History - Dine POS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold mb-1">Past Orders</h2>
+            <p class="text-muted">Review your previous orders and reorder your favorites.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if orders %}
+                {% for order in orders %}
+                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-light text-dark border me-2">Order #{{ order.id }}</span>
+                            <small class="text-muted"><i class="fa-regular fa-clock me-1"></i>{{ order.created_at.strftime('%b %d, %Y - %I:%M %p') }}</small>
+                        </div>
+                        <div>
+                            <span class="badge rounded-pill {% if order.status == 'Completed' %}bg-success{% elif order.status == 'Pending' %}bg-warning text-dark{% else %}bg-primary{% endif %} px-3 py-2">
+                                {{ order.status }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body px-4 pb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-utensils text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Table No: {{ order.table_no }}</h6>
+                                <p class="text-muted small mb-0">{{ order.items|length }} Items</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-light rounded-3 p-3 mb-3">
+                            {% for item in order.items %}
+                            <div class="d-flex justify-content-between align-items-center {% if not loop.last %}mb-2 border-bottom pb-2{% endif %}">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-white text-dark border me-2">{{ item.quantity }}x</span>
+                                    <span class="fw-medium text-dark">{{ item.dish.dish_name if item.dish else 'Unknown Item' }}</span>
+                                </div>
+                                <span class="text-muted">₹{{ item.price }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <h5 class="fw-bold mb-0">Total: ₹{{ order.total_amount }}</h5>
+                            <div class="d-flex gap-2">
+                                {% if order.status == 'Pending' %}
+                                    <form method="POST" action="{{ url_for('main.cancel_order', order_id=order.id) }}" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                        <button type="submit" class="btn btn-outline-danger rounded-pill px-4">Cancel Order</button>
+                                    </form>
+                                {% endif %}
+                                
+                                {% if order.status == 'Served' and order.payment_status == 'Pending' %}
+                                    <a href="{{ url_for('main.pay_bill', order_id=order.id) }}" class="btn btn-primary-custom rounded-pill px-4">Pay Bill</a>
+                                {% endif %}
+                                
+                                {% if order.payment_status == 'Completed' %}
+                                    <button class="btn btn-success rounded-pill px-4" disabled><i class="fa-solid fa-check me-2"></i>Paid</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-7359557-6024626.png" alt="Empty Orders" class="img-fluid mb-4" style="max-height: 200px; opacity: 0.7;">
+                    <h4 class="fw-bold text-dark">No orders yet</h4>
+                    <p class="text-muted mb-4">Looks like you haven't placed an order yet.</p>
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary-custom px-4 py-2">Browse Menu</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

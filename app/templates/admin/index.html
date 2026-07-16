@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Dine POS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold" style="color: var(--primary-color);">Admin Dashboard</h2>
+            <p class="text-muted mb-0">Welcome back, {{ current_user.name }}!</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Summary Cards Placeholder -->
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.dishes') }}" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fa-solid fa-utensils fs-1 mb-3" style="color: var(--accent);"></i>
+                        <h5 class="card-title text-muted">Dishes</h5>
+                        <h3 class="fw-bold mb-0 text-dark">Manage</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.categories') }}" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 categories-card">
+                    <div class="card-body text-center p-4">
+                        <i class="fa-solid fa-list fs-1 mb-3 text-info"></i>
+                        <h5 class="card-title text-muted">Categories</h5>
+                        <h3 class="fw-bold mb-0 text-dark">Manage</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.orders') }}" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 orders-card">
+                    <div class="card-body text-center p-4">
+                        <i class="fa-solid fa-clipboard-list fs-1 mb-3 text-success"></i>
+                        <h5 class="card-title text-muted">Orders</h5>
+                        <h3 class="fw-bold mb-0 text-dark">View</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.users') }}" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 users-card">
+                    <div class="card-body text-center p-4">
+                        <i class="fa-solid fa-users fs-1 mb-3 text-warning"></i>
+                        <h5 class="card-title text-muted">Users</h5>
+                        <h3 class="fw-bold mb-0 text-dark">View</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Recent Orders</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Table No</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td class="ps-4 fw-medium">#{{ order.id }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-chair me-1"></i>{{ order.table_no }}</span>
+                                    </td>
+                                    <td class="fw-bold">₹{{ order.total_amount }}</td>
+                                    <td>
+                                        {% if order.status == 'Pending' %}
+                                            <span class="badge bg-warning text-dark">{{ order.status }}</span>
+                                        {% elif order.status == 'Completed' or order.status == 'Served' %}
+                                            <span class="badge bg-success">{{ order.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-info text-dark">{{ order.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if order.payment_status == 'Completed' %}
+                                            <span class="badge bg-success"><i class="fa-solid fa-check-circle me-1"></i>Paid</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary"><i class="fa-solid fa-clock me-1"></i>Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ url_for('admin.view_order', id=order.id) }}" class="btn btn-sm btn-outline-primary" title="View Details">
+                                            <i class="fa-solid fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No recent orders yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

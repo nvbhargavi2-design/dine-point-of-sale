@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Modern Hero Section -->
+<section class="hero-section text-center position-relative" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80') center/cover; padding: 120px 0 80px 0; margin-bottom: 40px;">
+    <div class="container position-relative" style="z-index: 2;">
+        <h1 class="display-3 fw-bold text-white mb-3" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Discover the Best Food</h1>
+        <p class="lead text-light mb-5">Order from top restaurants with just a few clicks.</p>
+        
+        <!-- Search Bar -->
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="input-group input-group-lg shadow-lg" style="border-radius: 50px; overflow: hidden;">
+                    <span class="input-group-text bg-white border-0 ps-4"><i class="fa-solid fa-location-dot text-danger"></i></span>
+                    <input type="text" id="searchInput" class="form-control border-0 px-3" placeholder="Search for restaurant, cuisine or a dish..." style="box-shadow: none;">
+                    <button class="btn btn-primary-custom px-4 rounded-0" id="searchBtn" type="button" style="border-radius: 0 50px 50px 0 !important;">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container pb-5" id="menu">
+    <!-- Offers / Banners -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex overflow-auto gap-3 pb-2" style="scrollbar-width: none;">
+                <div class="card border-0 rounded-4 shadow-sm flex-shrink-0" style="width: 300px; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">50% OFF</h5>
+                            <p class="mb-0 text-dark small">Up to ₹100 on first order</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card border-0 rounded-4 shadow-sm flex-shrink-0" style="width: 300px; background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">Free Delivery</h5>
+                            <p class="mb-0 text-dark small">On orders above ₹500</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories section -->
+    <div class="mb-5">
+        <h4 class="fw-bold mb-4">What's on your mind?</h4>
+        <div class="d-flex overflow-auto gap-3 pb-3" id="category-filters" style="scrollbar-width: thin;">
+            <a href="javascript:void(0)" class="category-pill active text-center" data-filter="all">All Items</a>
+            {% for category in categories %}
+                <a href="javascript:void(0)" class="category-pill text-center" data-filter="{{ category.id }}">{{ category.category_name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Dishes Grid -->
+    <div class="mb-5">
+        <h4 class="fw-bold mb-4 border-bottom pb-2">Top dishes near you</h4>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-2">
+            {% for dish in dishes %}
+            <div class="col dish-item" data-category="{{ dish.category_id }}">
+                <div class="card h-100 food-card position-relative">
+                    <img src="{{ dish.image or 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=500' }}" class="card-img-top" alt="{{ dish.dish_name }}">
+                    
+                    <!-- Favorite Button -->
+                    <div class="position-absolute top-0 end-0 p-2 m-2 bg-white rounded-circle shadow-sm cursor-pointer toggle-wishlist" data-id="{{ dish.id }}" style="cursor: pointer; transition: all 0.2s;">
+                        {% if current_user.is_authenticated and dish.id in wishlist_dish_ids %}
+                            <i class="fa-solid fa-heart text-danger"></i>
+                        {% else %}
+                            <i class="fa-regular fa-heart text-muted"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h5 class="card-title text-truncate" title="{{ dish.dish_name }}">{{ dish.dish_name }}</h5>
+                            <span class="badge bg-success rounded-1"><i class="fa-solid fa-star me-1" style="font-size: 0.7rem;"></i>4.5</span>
+                        </div>
+                        <p class="text-muted small mb-2 text-truncate">{{ dish.category.category_name if dish.category else 'General' }} • 30-40 mins</p>
+                        
+                        <p class="card-text text-muted small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ dish.description or 'A delicious meal prepared with fresh ingredients.' }}
+                        </p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <span class="price-tag mb-0">₹{{ dish.price }}</span>
+                            <button class="btn btn-outline-success px-4 rounded-pill fw-bold bg-white text-success add-to-cart" data-id="{{ dish.id }}" style="border: 1px solid #198754; transition: all 0.2s;">
+                                ADD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center my-5" id="no-dishes-message">
+                <i class="fa-solid fa-utensils fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted">No dishes available at the moment.</h5>
+            </div>
+            {% endfor %}
+            <div class="col-12 text-center my-5 d-none" id="no-filter-results">
+                <i class="fa-solid fa-magnifying-glass fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted">No dishes found in this category.</h5>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filters = document.querySelectorAll('.category-pill');
+        const dishItems = document.querySelectorAll('.dish-item');
+        const noResultsMsg = document.getElementById('no-filter-results');
+        
+        filters.forEach(filter => {
+            filter.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all
+                filters.forEach(f => f.classList.remove('active'));
+                
+                // Add active class to clicked
+                this.classList.add('active');
+                
+                const categoryId = this.getAttribute('data-filter');
+                let visibleCount = 0;
+                
+                dishItems.forEach(item => {
+                    if (categoryId === 'all' || item.getAttribute('data-category') === categoryId) {
+                        item.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                });
+                
+                if (visibleCount === 0 && dishItems.length > 0) {
+                    noResultsMsg.classList.remove('d-none');
+                } else {
+                    noResultsMsg.classList.add('d-none');
+                }
+            });
+        });
+
+        // Search Logic
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+
+        function performSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+            
+            // Reset category filters to "All" when searching
+            filters.forEach(f => f.classList.remove('active'));
+            document.querySelector('.category-pill[data-filter="all"]').classList.add('active');
+
+            dishItems.forEach(item => {
+                const title = item.querySelector('.card-title').innerText.toLowerCase();
+                const desc = item.querySelector('.card-text').innerText.toLowerCase();
+                
+                if (title.includes(query) || desc.includes(query)) {
+                    item.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            if (visibleCount === 0 && dishItems.length > 0) {
+                noResultsMsg.classList.remove('d-none');
+            } else {
+                noResultsMsg.classList.add('d-none');
+            }
+            
+            // Scroll to menu section smoothly if they typed something
+            if (query.length > 0) {
+                document.getElementById('menu').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            } else {
+                // Optional: live search as they type
+                const query = searchInput.value.toLowerCase().trim();
+                let visibleCount = 0;
+                dishItems.forEach(item => {
+                    const title = item.querySelector('.card-title').innerText.toLowerCase();
+                    const desc = item.querySelector('.card-text').innerText.toLowerCase();
+                    if (title.includes(query) || desc.includes(query)) {
+                        item.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                });
+                if (visibleCount === 0 && dishItems.length > 0) {
+                    noResultsMsg.classList.remove('d-none');
+                } else {
+                    noResultsMsg.classList.add('d-none');
+                }
+            }
+        });
+
+        // Add to Cart Logic
+        const addToCartBtns = document.querySelectorAll('.add-to-cart');
+        const isLoggedIn = "{{ current_user.is_authenticated }}" === "True";
+        
+        addToCartBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!isLoggedIn) {
+                    alert('Please login or register to add items to your cart.');
+                    window.location.href = "{{ url_for('auth.login') }}";
+                    return;
+                }
+                
+                const dishId = this.getAttribute('data-id');
+                const originalText = this.innerText;
+                
+                // Show loading state
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                this.disabled = true;
+
+                fetch(`/add_to_cart/${dishId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) return;
+                    this.disabled = false;
+                    
+                    if (data.success) {
+                        this.innerHTML = '<i class="fa-solid fa-check"></i> ADDED';
+                        this.classList.remove('btn-outline-success', 'text-success', 'bg-white');
+                        this.classList.add('btn-success', 'text-white');
+                        
+                        // Update cart badge if it exists
+                        const cartBadge = document.getElementById('cart-badge');
+                        if (cartBadge) {
+                            cartBadge.innerText = data.cart_count;
+                            // Add a little pop animation
+                            cartBadge.style.transform = 'scale(1.3)';
+                            setTimeout(() => cartBadge.style.transform = 'scale(1) translate(-50%, -50%)', 200);
+                        }
+
+                        // Reset button after 2 seconds
+                        setTimeout(() => {
+                            this.innerHTML = 'ADD';
+                            this.classList.remove('btn-success', 'text-white');
+                            this.classList.add('btn-outline-success', 'text-success', 'bg-white');
+                        }, 2000);
+                    } else {
+                        this.innerText = originalText;
+                        alert(data.message || 'Error adding to cart');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.disabled = false;
+                    this.innerText = originalText;
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+        // Wishlist Toggle Logic
+        const wishlistBtns = document.querySelectorAll('.toggle-wishlist');
+        wishlistBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!isLoggedIn) {
+                    alert('Please login or register to manage your wishlist.');
+                    window.location.href = "{{ url_for('auth.login') }}";
+                    return;
+                }
+                
+                const dishId = this.getAttribute('data-id');
+                const icon = this.querySelector('i');
+                
+                // Add a small scale animation
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => this.style.transform = 'scale(1)', 200);
+                
+                fetch(`/wishlist/toggle/${dishId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        if (data.action === 'added') {
+                            icon.classList.remove('fa-regular', 'text-muted');
+                            icon.classList.add('fa-solid', 'text-danger');
+                        } else {
+                            icon.classList.remove('fa-solid', 'text-danger');
+                            icon.classList.add('fa-regular', 'text-muted');
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

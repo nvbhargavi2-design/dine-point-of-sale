@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Login / Sign up - Dine POS{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0 auth-page-bg">
+    <div class="row g-0 vh-100 align-items-center justify-content-center">
+        <!-- Auth Card -->
+        <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+            <div class="card border-0 shadow-lg auth-card-modern mx-3 mx-md-0">
+                <div class="card-body p-5">
+                    
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <h2 class="fw-bold fs-1 mb-1">Login</h2>
+                            <p class="text-muted mb-0">or <span class="fw-semibold text-dark">create an account</span></p>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=100&h=100" alt="Food Icon" class="rounded-circle shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                    </div>
+                    
+                    <hr class="mb-4" style="width: 50px; height: 3px; background-color: var(--primary-color); opacity: 1;">
+                    
+                    <form method="POST" action="{{ url_for('auth.register') }}" class="mt-4">
+                        <div class="form-floating mb-3">
+                            <input type="tel" class="form-control auth-input" id="mobile" name="mobile" placeholder="Mobile Number" required pattern="[0-9]{10}">
+                            <label for="mobile" class="text-muted">Phone Number</label>
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            <input type="email" class="form-control auth-input" id="email" name="email" placeholder="Email Address" required>
+                            <label for="email" class="text-muted">Email Address (for receipts)</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3 fw-bold fs-5 shadow-sm">CONTINUE</button>
+                    </form>
+                    
+                    <p class="text-muted small mt-4 text-center">
+                        By clicking on Login, I accept the <a href="#" class="text-dark fw-medium">Terms & Conditions</a> & <a href="#" class="text-dark fw-medium">Privacy Policy</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

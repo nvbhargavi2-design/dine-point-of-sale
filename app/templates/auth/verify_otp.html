@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP - Dine POS{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0 auth-page-bg">
+    <div class="row g-0 vh-100 align-items-center justify-content-center">
+        <!-- Auth Card -->
+        <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+            <div class="card border-0 shadow-lg auth-card-modern mx-3 mx-md-0">
+                <div class="card-body p-5">
+                    
+                    <div class="mb-4">
+                        <a href="{{ url_for('auth.register') }}" class="text-dark text-decoration-none fs-4"><i class="fa-solid fa-arrow-left"></i></a>
+                    </div>
+
+                    <h3 class="fw-bold fs-2 mb-2">Enter OTP</h3>
+                    <p class="text-muted mb-4">We've sent a verification code to <br><span class="fw-bold text-dark">+91 {{ mobile }}</span></p>
+                    
+                    <form method="POST" action="{{ url_for('auth.verify_otp') }}">
+                        <!-- Use a single input for simplicity, or 6 boxes. Using a single input styled well -->
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control auth-input text-center fs-3 fw-bold" id="otp" name="otp" placeholder="123456" required pattern="[0-9]{6}" maxlength="6" autocomplete="off" autofocus>
+                            <label for="otp" class="text-muted">6-digit OTP</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3 fw-bold fs-5 shadow-sm">VERIFY OTP</button>
+                    </form>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-muted mb-0">
+                            Didn't receive the OTP? 
+                            <span id="timer" class="fw-medium text-dark ms-1">00:60</span>
+                            <a href="{{ url_for('auth.register') }}" id="resendBtn" class="text-decoration-none fw-bold ms-1 d-none" style="color: var(--accent);">RESEND OTP</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Simple Countdown Timer
+    document.addEventListener('DOMContentLoaded', function() {
+        let timeLeft = 60;
+        const timerElement = document.getElementById('timer');
+        const resendBtn = document.getElementById('resendBtn');
+        
+        const countdown = setInterval(() => {
+            timeLeft--;
+            let seconds = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+            timerElement.textContent = `00:${seconds}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.classList.add('d-none');
+                resendBtn.classList.remove('d-none');
+            }
+        }, 1000);
+    });
+</script>
+{% endblock %}
